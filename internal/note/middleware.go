@@ -1,16 +1,13 @@
 package note
 
-import "errors"
+import (
+	"fmt"
+	"net/http"
+)
 
-func validateNoteInput(title, content string) error {
-	if title == "" {
-		return errors.New("title is required")
-	}
-	if len(title) > 255 {
-		return errors.New("title is too long")
-	}
-	if content == "" {
-		return errors.New("content is required")
-	}
-	return nil
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Printf("[LOG] %s %s\n", r.Method, r.URL.Path)
+		next.ServeHTTP(w, r)
+	})
 }

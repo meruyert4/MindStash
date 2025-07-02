@@ -7,13 +7,13 @@ import (
 )
 
 type NoteHandler struct {
-	service service
+	service Service
 	logger  logger.Logger
 }
 
 func NewHandler(s Service, log logger.Logger) *NoteHandler {
 	return &NoteHandler{
-		service: service{},
+		service: s,
 		logger:  log,
 	}
 }
@@ -28,7 +28,7 @@ func (h *NoteHandler) CreateNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	created, err := h.service.CreateNote(input)
+	created, err := h.service.CreateNote(ctx, input)
 	if err != nil {
 		h.logger.Error(ctx, err.Error(), "error", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -44,7 +44,7 @@ func (h *NoteHandler) GetNoteById(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := r.PathValue("id")
 
-	note, err := h.service.GetNoteById(id)
+	note, err := h.service.GetNoteById(ctx, id)
 	if err != nil {
 		h.logger.Error(ctx, err.Error(), "id=", id)
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -58,7 +58,7 @@ func (h *NoteHandler) GetNoteById(w http.ResponseWriter, r *http.Request) {
 
 func (h *NoteHandler) GetNotes(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	notes, err := h.service.GetNotes()
+	notes, err := h.service.GetNotes(ctx)
 	if err != nil {
 		h.logger.Error(ctx, err.Error(), "error")
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -80,7 +80,7 @@ func (h *NoteHandler) UpdateNote(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid json", http.StatusBadRequest)
 		return
 	}
-	updatedNote, err := h.service.UpdateNote(id, input)
+	updatedNote, err := h.service.UpdateNote(ctx, id, input)
 	if err != nil {
 		h.logger.Error(ctx, err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -96,7 +96,7 @@ func (h *NoteHandler) DeleteNote(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := r.PathValue("id")
 
-	err := h.service.DeleteNote(id)
+	err := h.service.DeleteNote(ctx, id)
 	if err != nil {
 		h.logger.Error(ctx, err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
