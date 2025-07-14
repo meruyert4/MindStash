@@ -33,6 +33,7 @@ func main() {
 	handler := note.NewHandler(service, logg)
 
 	mux := http.NewServeMux()
+	mux.Handle("/", http.FileServer(http.Dir("./frontend")))
 	mux.HandleFunc("POST /notes", handler.CreateNote)
 	mux.HandleFunc("GET /notes", handler.GetNotes)
 	mux.HandleFunc("GET /notes/{id}", handler.GetNoteById)

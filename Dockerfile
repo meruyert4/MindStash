@@ -21,6 +21,7 @@ RUN adduser -D -g '' mindstashuser
 
 WORKDIR /app
 COPY --from=builder /app/mindstash .
+COPY --from=builder /app/frontend ./frontend
 
 USER mindstashuser
 
